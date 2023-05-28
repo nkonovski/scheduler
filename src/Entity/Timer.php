@@ -16,13 +16,13 @@ class Timer
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[OneToMany(targetEntity: Project::class, inversedBy: 'timers')]
-    #[JoinColumn(nullable: true)]
-    private ?string $project = null;
+    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'timers')]
+    #[ORM\JoinColumn(nullable: true)]
+    private $project;
 
-    #[OneToMany(targetEntity: User::class, inversedBy: 'timers')]
-    #[JoinColumn(nullable: true)]
-    private ?string $user = null;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'timers')]
+    #[ORM\JoinColumn(nullable: true)]
+    private $user;
 
     #[ORM\Column]
     private ?\DateTime $startedAt = null;
@@ -53,48 +53,48 @@ class Timer
         return $this;
     }
 
-    public function getProject(): ?string
+    public function getProject()
     {
         return $this->project;
     }
 
-    public function setProject(string $project): self
+    public function setProject($project): self
     {
         $this->project = $project;
 
         return $this;
     }
 
-    public function getUser(): ?string
+    public function getUser()
     {
         return $this->user;
     }
 
-    public function setUser(string $user): self
+    public function setUser($user): self
     {
         $this->user = $user;
 
         return $this;
     }
 
-    public function getStartedAt(): ?\DateTimeImmutable
+    public function getStartedAt(): ?\DateTime
     {
         return $this->startedAt;
     }
 
-    public function setStartedAt(\DateTimeImmutable $startedAt): self
+    public function setStartedAt(\DateTime $startedAt): self
     {
         $this->startedAt = $startedAt;
 
         return $this;
     }
 
-    public function getStopedAt(): ?\DateTimeImmutable
+    public function getStopedAt(): ?\DateTime
     {
         return $this->stopedAt;
     }
 
-    public function setStopedAt(?\DateTimeImmutable $stopedAt): self
+    public function setStopedAt(?\DateTime $stopedAt): self
     {
         $this->stopedAt = $stopedAt;
 

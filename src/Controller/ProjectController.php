@@ -3,16 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Project;
+use App\Form\ProjectType;
 use Doctrine\ORM\EntityManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Constraints\DateTime;
 
 class ProjectController extends AbstractController
@@ -38,55 +33,39 @@ class ProjectController extends AbstractController
         $this->projectRepository = $entityManager->getRepository(Project::class);
     }
 
-    #[Route('/projects', name: 'project')]
+    #[Route('/projects', name: 'app_projects')]
     public function index()
     {
         $projects = $this->projectRepository->findByUser($this->getUser()->getId());
-        $jsonContent = $this->serializeObject($projects);
-        return new Response($jsonContent, Response::HTTP_OK);
+        return $this->render('project/list.html.twig', [
+            'projects' => $projects,
+        ]);
     }
 
-    /**
-     * @param Request $request
-     * @return Response
-     */
     #[Route('/projects/create', name: 'create_project')]
-    public function saveProjects(Request $request)
+    public function registerAction(Request $request)
     {
-        $content = json_decode($request->getContent(), true);
+        $project = new Project();
+        $form = $this->createForm(ProjectType::class, $project);
+        $form->handleRequest($request);
 
-        if($content['name']) {
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            $project->setName($data->getName());
 
-            $project = new Project();
             $project->setUser($this->getUser());
-            $project->setName($content['name']);
             $project->setTimers([]);
             $project->setCreatedAt(new \DateTime());
             $project->setUpdatedAt(new \DateTime());
+
+            // save the Project
             $this->updateDatabase($project);
-
-            // Serialize object into Json format
-            $jsonContent = $this->serializeObject($project);
-
-            return new Response($jsonContent, Response::HTTP_OK);
+            return $this->redirectToRoute('app_projects');
         }
 
-        return new Response('Error', Response::HTTP_NOT_FOUND);
-    }
-
-    public function serializeObject($object)
-    {
-        $encoders = new JsonEncoder();
-        $normalizers = new ObjectNormalizer();
-
-        $normalizers->setCircularReferenceHandler(function ($obj) {
-            return $obj->getId();
-        });
-        $serializer = new Serializer(array($normalizers), array($encoders));
-
-        $jsonContent = $serializer->serialize($object, 'json');
-
-        return $jsonContent;
+        return $this->render('project/form.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
 
     public function updateDatabase($object)

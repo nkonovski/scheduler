@@ -28,14 +28,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?bool $isActive = null;
 
-    #[OneToMany(targetEntity: Project::class, mappedBy: 'user')]
-    private ?string $project = null;
+    #[ORM\OneToMany(targetEntity: Project::class, mappedBy: 'user')]
+    private $project;
 
-    #[OneToMany(targetEntity: Timer::class, mappedBy: 'user')]
-    private ?string $timer = null;
+    #[ORM\OneToMany(targetEntity: Timer::class, mappedBy: 'user')]
+    private $timer;
 
     public function getId(): ?int
     {
@@ -120,24 +120,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getProject(): ?string
+    public function getProject()
     {
         return $this->project;
     }
 
-    public function setProject(string $project): self
+    public function setProject($project): self
     {
         $this->project = $project;
 
         return $this;
     }
 
-    public function getTimer(): ?string
+    public function getTimer()
     {
         return $this->timer;
     }
 
-    public function setTimer(string $timer): self
+    public function setTimer($timer): self
     {
         $this->timer = $timer;
 

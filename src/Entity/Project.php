@@ -16,12 +16,12 @@ class Project
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[OneToMany(targetEntity: User::class, mappedBy: 'project')]
-    #[JoinColumn(nullable: true)]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'project')]
+    #[ORM\JoinColumn(nullable: true)]
     private $user;
 
-    #[OneToMany(targetEntity: Timer::class, mappedBy: 'project')]
-    private $timers = null;
+    #[ORM\OneToMany(targetEntity: Timer::class, mappedBy: 'project')]
+    private $timers;
 
     #[ORM\Column]
     private ?\DateTime $createdAt = null;
@@ -54,36 +54,36 @@ class Project
         $this->user = $user;
     }
 
-    public function getTimer(): ?string
+    public function getTimers(): array
     {
-        return $this->timer;
+        return $this->timers;
     }
 
-    public function setTimer(string $timer): self
+    public function setTimers($timers): self
     {
-        $this->timer = $timer;
+        $this->timers = $timers;
 
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    public function setCreatedAt(\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): self
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 
