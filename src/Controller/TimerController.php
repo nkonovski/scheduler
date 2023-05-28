@@ -37,9 +37,7 @@ class TimerController extends AbstractController
         $this->timerRepository = $entityManager->getRepository(Timer::class);
     }
 
-    /**
-     * @Route("/projects/{id}/timers", name="timer")
-     */
+    #[Route('/projects/{id}/timers', name: 'timer')]
     public function createTimer(Request $request, int $id)
     {
         $content = json_decode($request->getContent(), true);
@@ -62,9 +60,7 @@ class TimerController extends AbstractController
 
     }
 
-    /**
-     * @Route("/project/timers/active", name="active_timer")
-     */
+    #[Route('/project/timers/active', name: 'active_timer')]
     public function runningTimer()
     {
         $timer = $this->timerRepository->findRunningTimer($this->getUser()->getId());
@@ -74,9 +70,7 @@ class TimerController extends AbstractController
         return new Response($jsonContent, Response::HTTP_OK);
     }
 
-    /**
-     * @Route("/projects/{id}/timers/stop", name="stop_running")
-     */
+    #[Route('/projects/{id}/timers/stop', name: 'stop_running')]
     public function stopRunningTimer()
     {
         $timer = $this->timerRepository->findRunningTimer($this->getUser()->getId());

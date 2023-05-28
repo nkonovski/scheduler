@@ -31,11 +31,11 @@ class RegistrationController extends AbstractController
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $password = $passwordEncoder->encodePassword($user, $user->getPlainPassword());
+            $password = $passwordEncoder->hashPassword($user, $user->getPlainPassword());
             $user->setPassword($password);
             // save the User
             $this->updateDatabase($user);
-            return $this->redirectToRoute('home');
+            return $this->redirectToRoute('app_home');
         }
         return $this->render('registration/register.html.twig', [
             'form' => $form->createView(),

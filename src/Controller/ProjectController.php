@@ -38,25 +38,19 @@ class ProjectController extends AbstractController
         $this->projectRepository = $entityManager->getRepository(Project::class);
     }
 
-    /**
-     * @Route("/projects", name="project")
-     */
+    #[Route('/projects', name: 'project')]
     public function index()
     {
         $projects = $this->projectRepository->findByUser($this->getUser()->getId());
-
         $jsonContent = $this->serializeObject($projects);
-
         return new Response($jsonContent, Response::HTTP_OK);
-
     }
-
 
     /**
      * @param Request $request
      * @return Response
-     * @Route("/projects/create", name="create_project")
      */
+    #[Route('/projects/create', name: 'create_project')]
     public function saveProjects(Request $request)
     {
         $content = json_decode($request->getContent(), true);
@@ -78,9 +72,7 @@ class ProjectController extends AbstractController
         }
 
         return new Response('Error', Response::HTTP_NOT_FOUND);
-
     }
-
 
     public function serializeObject($object)
     {
@@ -96,7 +88,6 @@ class ProjectController extends AbstractController
 
         return $jsonContent;
     }
-
 
     public function updateDatabase($object)
     {
