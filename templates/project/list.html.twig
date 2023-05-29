@@ -13,12 +13,94 @@
 
     <ul>
         {% for project in projects %}
-            <li>{{ project.name }} <a href="{{ path('app_login') }}">Open</a> </li>
+            <li>{{ project.name }}         
+                <button type="button" class="btn btn-primary btn-start"  data-id="{{ project.id }}">
+                    Start Timer
+                </button> 
+            </li>
         {% endfor %}
     </ul>
 
-    <button type="button" class="btn btn-info">
-        <a href="{{ path('create_project') }}">Create new Project</a>
-    </button>
+    <div class="form-group col-md-12">
+        <button type="button" class="btn btn-info">
+            <a href="{{ path('create_project') }}">Create new Project</a>
+        </button>
+    </div>
+
+    <div class="form-group col-md-12">
+      <h3>Current Timer</h3>
+      <div class="form-group col-md-12" id="timer-project"></div>
+      <div class="form-group col-md-12" id="timer-name"></div>
+      <div class="form-group col-md-12" id="timer-start"></div>
+
+    </div>
 </div>
+
+<script>
+    $(function(){
+        var currentActiveProject;
+
+        $.ajax({
+            url: "/project/timers/active",
+            type: "get",
+            dataType: "json",
+            success: function(res) {
+                console.log(res);
+
+                if(res) {
+                    $("#timer-project").text('Active project: ' + res.project.name);
+                    $("#timer-name").text('Timer name: ' + res.name);
+                    $("#timer-start").text('Started at: ' + res.startedAt.timestamp);
+                    currentActiveProject = res.project.id;
+                    $(`.btn-start[data-id="${res.project.id}"]`).text('Stop');
+                }
+            }
+        });
+
+
+        $(".btn-start").on("click", function() {
+            var id = $(this).data("id");
+            var button = $(this);
+
+            if (id == currentActiveProject) {
+                // stop project timer
+
+                $.ajax({
+                    url: `/projects/${id}/timers/stop`,
+                    type: "get",
+                    success: function(res) {
+                        console.log(res);
+                        button.text('Start Timer');
+
+                        $("#timer-project").text('');
+                        $("#timer-name").text('');
+                        $("#timer-start").text('');
+
+                        currentActiveProject = 0;
+                    }
+                 });
+
+            } else {
+                // start project timer
+                $.ajax({
+                    url: `/projects/${id}/timers`,
+                    type: "post",
+                    data: { name: "test" },
+                    dataType: "json",
+                    success: function(res) {
+                        console.log(res);
+                        button.text('Stop Timer');
+                        $("#timer-project").text('Active project: ' + res.project.name);
+                        $("#timer-name").text('Timer name: ' + res.name);
+                        $("#timer-start").text('Started at: ' + res.startedAt.timestamp);
+
+                        currentActiveProject = res.project.name;
+                    }
+                });
+
+
+            }
+        });
+    }) 
+</script>
 {% endblock %}

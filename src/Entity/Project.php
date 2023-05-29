@@ -54,7 +54,7 @@ class Project
         $this->user = $user;
     }
 
-    public function getTimers(): array
+    public function getTimers()
     {
         return $this->timers;
     }

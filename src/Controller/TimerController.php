@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Timer;
+use App\Entity\Project;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -40,12 +42,10 @@ class TimerController extends AbstractController
     #[Route('/projects/{id}/timers', name: 'timer')]
     public function createTimer(Request $request, int $id)
     {
-        $content = json_decode($request->getContent(), true);
-
         $project = $this->projectRepository->find($id);
 
         $timer = new Timer();
-        $timer->setName($content['name']);
+        $timer->setName($request->get('name'));
         $timer->setUser($this->getUser());
         $timer->setProject($project);
         $timer->setStartedAt(new \DateTime());
@@ -56,7 +56,7 @@ class TimerController extends AbstractController
         // Serialize object into Json format
         $jsonContent = $this->serializeObject($timer);
 
-        return new Response($jsonContent, Response::HTTP_OK);
+        return $jsonContent;
 
     }
 
@@ -67,7 +67,7 @@ class TimerController extends AbstractController
 
         $jsonContent = $this->serializeObject($timer);
 
-        return new Response($jsonContent, Response::HTTP_OK);
+        return $jsonContent;
     }
 
     #[Route('/projects/{id}/timers/stop', name: 'stop_running')]
@@ -83,22 +83,24 @@ class TimerController extends AbstractController
         // Serialize object into Json format
         $jsonContent = $this->serializeObject($timer);
 
-        return new Response($jsonContent, Response::HTTP_OK);
+        return $jsonContent;
     }
 
     public function serializeObject($object)
     {
-        $encoders = new JsonEncoder();
-        $normalizers = new ObjectNormalizer();
-
-        $normalizers->setCircularReferenceHandler(function ($obj) {
-            return $obj->getId();
-        });
-        $serializer = new Serializer(array($normalizers), array($encoders));
-
-        $jsonContent = $serializer->serialize($object, 'json');
-
-        return $jsonContent;
+        $encoders = [new JsonEncoder()]; 
+        $normalizers = [new ObjectNormalizer()];
+        $serializer = new Serializer($normalizers, $encoders);
+        
+        // Serialize your object in Json
+        $jsonObject = $serializer->serialize($object, 'json', [
+            'circular_reference_handler' => function ($o) {
+                return $o->getId();
+            }
+        ]);
+        
+        // For instance, return a Response with encoded Json
+        return new Response($jsonObject, 200, ['Content-Type' => 'application/json']);
     }
 
 

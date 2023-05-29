@@ -28,7 +28,7 @@ class Timer
     private ?\DateTime $startedAt = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTime $stopedAt = null;
+    private ?\DateTime $stoppedAt = null;
 
     #[ORM\Column]
     private ?\DateTime $created = null;
@@ -89,36 +89,36 @@ class Timer
         return $this;
     }
 
-    public function getStopedAt(): ?\DateTime
+    public function getStoppedAt(): ?\DateTime
     {
-        return $this->stopedAt;
+        return $this->stoppedAt;
     }
 
-    public function setStopedAt(?\DateTime $stopedAt): self
+    public function setStoppedAt(?\DateTime $stoppedAt): self
     {
-        $this->stopedAt = $stopedAt;
+        $this->stoppedAt = $stoppedAt;
 
         return $this;
     }
 
-    public function getCreated(): ?string
+    public function getCreated(): ?\DateTime
     {
         return $this->created;
     }
 
-    public function setCreated(string $created): self
+    public function setCreated(?\DateTime $created): self
     {
         $this->created = $created;
 
         return $this;
     }
 
-    public function getUpdated(): ?string
+    public function getUpdated(): ?\DateTime
     {
         return $this->updated;
     }
 
-    public function setUpdated(?string $updated): self
+    public function setUpdated(?\DateTime $updated): self
     {
         $this->updated = $updated;
 
